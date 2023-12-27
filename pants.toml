@@ -17,3 +17,8 @@ backend_packages = [
 
 [anonymous-telemetry]
 enabled = false
+
+[docker]
+executable_search_paths = [
+    "/usr/local/bin",
+]
