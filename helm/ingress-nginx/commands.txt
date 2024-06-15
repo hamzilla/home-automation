@@ -1,0 +1,1 @@
+helm upgrade nginx-ingress ingress-nginx/ --values ingress-nginx/values.yaml -f ingress-nginx/values-homelab.yaml

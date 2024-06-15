@@ -1,0 +1,12 @@
+namespaceOverride: nginx-ingress
+
+controller:
+  service:
+    externalTrafficPolicy: Local
+    type: LoadBalancer
+    annotations: 
+      io.cilium/lb-ipam-ips: "10.10.10.150" # Static IP Assignment
+  metrics:
+    enabled: true
+    #serviceMonitor: # Uncheck only if Prometheus metrics is installed 
+      #enabled: true # Uncheck only if Prometheus metrics is installed
