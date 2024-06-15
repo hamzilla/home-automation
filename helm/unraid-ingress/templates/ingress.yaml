@@ -1,6 +1,5 @@
 {{- if .Values.ingress.enabled -}}
-{{- $fullName := include "test.fullname" . -}}
-{{- $svcPort := .Values.service.port -}}
+{{- $fullName := include "unraid-ingress.fullname" . -}}
 {{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
   {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className}}
@@ -17,7 +16,7 @@ kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-    {{- include "test.labels" . | nindent 4 }}
+    {{- include "unraid-ingress.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -49,12 +48,12 @@ spec:
             backend:
               {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
-                name: {{ $fullName }}
+                name: {{ .serviceName }}
                 port:
-                  number: {{ $svcPort }}
+                  number: {{ .servicePort }}
               {{- else }}
-              serviceName: {{ $fullName }}
-              servicePort: {{ $svcPort }}
+              serviceName: {{ .serviceName }}
+              servicePort: {{ .servicePort }}
               {{- end }}
           {{- end }}
     {{- end }}

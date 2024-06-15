@@ -1,33 +1,40 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: overseer-ingress
-  namespace: unraid-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTP" # Remark this entry if you only have a HTTP port connection to external webserver
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: overseer.hamzilla.lan	
-    http:
-      paths:
-      - path: /
-        pathType: Prefix  # pathType no longer has a default value in v1; "Exact", "Prefix", or "ImplementationSpecific" must be specified
-        backend:
-          service:
-            name: overseer-svc # make sure this is same service name as in the service yaml
-            port:
-              number: 5055
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: overseer-svc
-  namespace: unraid-ingress
-spec:
-  ports:
-    - name: overseer-5055
-      protocol: TCP
+# Default values for foo.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+services:
+  enabled: true
+  service:
+    - name: overseer-svc
+      namespace: unraid-ingress
+      labels: unraid
+      type: ExternalName
+      externalName: 10.10.10.87
+      portName: overseer-5055
       port: 5055
-  type: ExternalName
-  externalName: 10.10.10.87
+      protocol: TCP
+    
+
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: overseer.hamzilla.lan	
+      paths:
+        - path: /
+          pathType: Prefix
+          serviceName: overseer-svc
+          servicePort: 5055
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+

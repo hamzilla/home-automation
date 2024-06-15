@@ -1,0 +1,17 @@
+{{- if .Values.services.enabled -}}
+{{- range $value := .Values.services.service }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $value.name }}
+  namespace: {{ $value.namespace }}
+spec:
+  type: {{ $value.type }}
+  externalName: {{ $value.externalName }}
+  ports:
+    - name: {{ $value.portName }}
+      protocol: {{ $value.protocol }}
+      port: {{ $value.port }}
+      
+{{- end }}
+{{- end }}
