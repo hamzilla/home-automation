@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: overseer-ingress
+  namespace: unraid-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP" # Remark this entry if you only have a HTTP port connection to external webserver
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: overseer.hamzilla.lan	
+    http:
+      paths:
+      - path: /
+        pathType: Prefix  # pathType no longer has a default value in v1; "Exact", "Prefix", or "ImplementationSpecific" must be specified
+        backend:
+          service:
+            name: overseer-svc # make sure this is same service name as in the service yaml
+            port:
+              number: 5055
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: overseer-svc
+  namespace: unraid-ingress
+spec:
+  ports:
+    - name: overseer-5055
+      protocol: TCP
+      port: 5055
+  type: ExternalName
+  externalName: 10.10.10.87

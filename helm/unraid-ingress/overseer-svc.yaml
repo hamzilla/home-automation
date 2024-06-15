@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: overseer-svc
+  namespace: unraid-ingress
+spec:
+  ports:
+    - name: overseer-5055
+      protocol: TCP
+      port: 5055
+  type: ExternalName
+  externalName: 10.10.10.87
