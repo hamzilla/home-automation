@@ -41,6 +41,14 @@ services:
       portName: pihole-80
       port: 80
       protocol: TCP  
+    - name: nas-svc
+      namespace: unraid-ingress
+      labels: unraid
+      type: ExternalName
+      externalName: 10.10.10.86
+      portName: nas-5000
+      port: 5000
+      protocol: TCP 
 
 ingress:
   enabled: true
@@ -71,8 +79,14 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
-          serviceName: sonar-svc
+          serviceName: pihole-svc
           servicePort: 80
+    - host: nas.hamzilla.lan	
+      paths:
+        - path: /
+          pathType: Prefix
+          serviceName: nas-svc
+          servicePort: 5000
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
