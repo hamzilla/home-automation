@@ -17,8 +17,30 @@ services:
       portName: overseer-5055
       port: 5055
       protocol: TCP
-    
-
+    - name: radar-svc
+      namespace: unraid-ingress
+      labels: unraid
+      type: ExternalName
+      externalName: 10.10.10.87
+      portName: radar-7878
+      port: 7878
+      protocol: TCP
+    - name: sonar-svc
+      namespace: unraid-ingress
+      labels: unraid
+      type: ExternalName
+      externalName: 10.10.10.87
+      portName: sonar-8989
+      port: 8989
+      protocol: TCP    
+    - name: pihole-svc
+      namespace: unraid-ingress
+      labels: unraid
+      type: ExternalName
+      externalName: 10.10.10.2
+      portName: pihole-80
+      port: 80
+      protocol: TCP  
 
 ingress:
   enabled: true
@@ -33,6 +55,24 @@ ingress:
           pathType: Prefix
           serviceName: overseer-svc
           servicePort: 5055
+    - host: radar.hamzilla.lan	
+      paths:
+        - path: /
+          pathType: Prefix
+          serviceName: radar-svc
+          servicePort: 7878
+    - host: sonar.hamzilla.lan	
+      paths:
+        - path: /
+          pathType: Prefix
+          serviceName: sonar-svc
+          servicePort: 8989
+    - host: pihole.hamzilla.lan	
+      paths:
+        - path: /
+          pathType: Prefix
+          serviceName: sonar-svc
+          servicePort: 80
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
