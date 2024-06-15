@@ -1,0 +1,1 @@
+helm diff upgrade --install unraid-ingress . --values values.yaml --namespace unraid-ingress
