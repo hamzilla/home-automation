@@ -1,0 +1,25 @@
+- name: Provision privileged user 
+  hosts: k3s_agent
+  vars:
+    user: ansible
+  tasks:
+    - name: Add {{ user }} user
+      become: yes
+      become_method: sudo
+      ansible.builtin.user:
+        name: "{{ user }}"
+    # - name: change user's password
+    #   become: yes
+    #   become_method: sudo
+    #   user:
+    #     name: "{{ user }}"
+    #     password: "{{ 'banshee' | password_hash('sha512') }}"
+    - name: Add {{ user }} user to sudoers
+      become: yes
+      become_method: sudo
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers
+        state: present
+        insertafter: '^%sudo'
+        line: '{{ user }} ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
