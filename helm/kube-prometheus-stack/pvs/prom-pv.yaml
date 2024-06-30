@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: prom-pv-nfs
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: prometheus-pv-nfs
+spec:
+  storageClassName: ""
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: 10.10.10.87            
+    path: "/mnt/user/prometheus" 
+    readOnly: false
