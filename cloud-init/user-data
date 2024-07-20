@@ -1,0 +1,135 @@
+#cloud-config
+autoinstall:
+  version: 1
+
+  source:
+    id: ubuntu-server-minimal
+
+  locale: en_US.UTF-8
+  keyboard:
+    layout: us
+  timezone: Europe/Rome
+
+  network:
+    network:
+      version: 2
+      ethernets:
+        enp1s0:
+          addresses:
+            - 10.10.10.124/24
+          routes:
+            - to: default
+              via: 10.10.10.1
+          nameservers:
+              addresses: [10.10.10.1, 1.1.1.1]
+
+  identity:
+    hostname: linuxconfig
+    password: "$6$exDY1mhS4KUYCE/2$zmn9ToZwTKLhCw.b4/b.ZRTIZM30JZ4QrOQ2aOXJ8yk96xpcCof0kxKwuX1kqLG/ygbJ1f8wxED22bTL4F46P0"
+    username: ubuntu
+
+  ssh:
+    install-server: true
+    allow-pw: true
+    authorized-keys: 
+      - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDAohUYma9nnGJelwFoLA/L970TxlTLdhlpH0TKYFaQx7H4vTDAXxVm0W5Zn94uuzgFxrvc0zDkdW8YcQfmgMrB6qWvWGnE2aRKBnpLBJIAdsMYuq1VxYG3njmIGISorw7f09fb1XBcqEcx0h26v1VIV7iPiKGVaBQBG2HpLtnnUwLZK7FHtKjAQ2lFOLjcVhP7DBFO/T2jn1PPa65hlwkb4m2MUrMvVjyplR6K88LUA7ZMU5DQfSTqZjNSYMR4yyfk2bGBGVlq8KlHvCCAaSlhxE4CWkTM7Uta+UuXUrzojuyBoxqHEnTbzCr5jja5NpiwVbDWa6YHD/MURcSpp5OYjlWUWLke75VgqQKQTbr/PlGF+dLmLBMJzGnILzf5w2jx7TUYkPS2PJtdyDytTpvc7cSQWo4DvhA2PNzDdjq7tjevhsD7P5s978C1KrQMSwo4E0eIt2upwcUkQAmH9rpv4uKuLBYUIST2WFY+2nOG12JEXAoNCLfeNrkZXzMf2BM= salwabalwa@Salwas-MacBook-Pro.local"
+
+  packages:
+    - git
+    - python3-pip
+    - network-manager
+
+  snaps:
+    - name: pycharm-community
+      channel: stable 
+      classic: true
+
+  shutdown: reboot
+  storage:
+    config:
+      - id: disk-vda
+        type: disk
+        ptable: gpt
+        path: /dev/vda
+        wipe: superblock-recursive
+
+      - id: efipart
+        type: partition
+        device: disk-vda
+        offset: 1048576
+        size: 600M
+        flag: boot
+        grub_device: true
+
+      - id: bootpart
+        type: partition
+        device: disk-vda
+        size: 1G
+
+      - id: pvpart
+        type: partition
+        device: disk-vda
+        size: -1
+
+      - id: pvpart-crypt
+        type: dm_crypt
+        volume: pvpart
+        key: password
+
+      - id: vg0
+        type: lvm_volgroup
+        name: vg0
+        devices:
+          - pvpart-crypt
+
+      - id: root_lv
+        type: lvm_partition
+        name: root_lv
+        volgroup: vg0
+        size: 10G
+ 
+      - id: home_lv
+        type: lvm_partition
+        name: home_lv
+        volgroup: vg0
+        size: 7G
+
+      - id: efipart_fs
+        type: format
+        volume: efipart
+        fstype: fat32
+
+      - id: bootpart_fs
+        type: format
+        volume: bootpart
+        fstype: ext4
+
+      - id: root_lv_fs
+        type: format
+        volume: root_lv
+        fstype: ext4
+
+      - id: home_lv_fs
+        type: format
+        volume: home_lv
+        fstype: ext4
+
+      - id: efipart-mount
+        type: mount
+        device: efipart_fs
+        path: /boot/efi
+
+      - id: bootpart-mount
+        type: mount
+        device: bootpart_fs
+        path: /boot
+
+      - id: root_lv_mount
+        type: mount
+        device: root_lv_fs
+        path: /
+
+      - id: home_lv_mount
+        type: mount
+        device: home_lv_fs
+        path: /home
