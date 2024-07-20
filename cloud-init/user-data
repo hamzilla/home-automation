@@ -26,7 +26,6 @@ autoinstall:
   ssh:
     install-server: true
     allow-pw: true
-    authorized-keys: ["ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDAohUYma9nnGJelwFoLA/L970TxlTLdhlpH0TKYFaQx7H4vTDAXxVm0W5Zn94uuzgFxrvc0zDkdW8YcQfmgMrB6qWvWGnE2aRKBnpLBJIAdsMYuq1VxYG3njmIGISorw7f09fb1XBcqEcx0h26v1VIV7iPiKGVaBQBG2HpLtnnUwLZK7FHtKjAQ2lFOLjcVhP7DBFO/T2jn1PPa65hlwkb4m2MUrMvVjyplR6K88LUA7ZMU5DQfSTqZjNSYMR4yyfk2bGBGVlq8KlHvCCAaSlhxE4CWkTM7Uta+UuXUrzojuyBoxqHEnTbzCr5jja5NpiwVbDWa6YHD/MURcSpp5OYjlWUWLke75VgqQKQTbr/PlGF+dLmLBMJzGnILzf5w2jx7TUYkPS2PJtdyDytTpvc7cSQWo4DvhA2PNzDdjq7tjevhsD7P5s978C1KrQMSwo4E0eIt2upwcUkQAmH9rpv4uKuLBYUIST2WFY+2nOG12JEXAoNCLfeNrkZXzMf2BM= salwabalwa@Salwas-MacBook-Pro.local"]
 
   packages:
     - git
@@ -38,6 +37,9 @@ autoinstall:
     - name: pycharm-community
       channel: stable 
       classic: true
+    - name: docker
+      channel: stable 
+      classic: true    
 
   shutdown: reboot
   storage:
@@ -129,14 +131,28 @@ autoinstall:
         device: home_lv_fs
         path: /home
 
+  # cloud-init settings which run on first boot: https://cloudinit.readthedocs.io/en/latest/index.html
   user-data:
     hostname: autoinstall-server
     users:
-      - name: hamzilla
+      - name: ansible
+        groups: sudo,admin,wheel
+        sudo: ALL=(ALL) NOPASSWD:ALL
+        shell: /bin/bash
+        lock_passwd: false
         # The command to hash the password is: openssl passwd -6 -stdin <<< [plain_text_password]
         # This password is: banshee
         passwd: $6$3q6tsfJ7xDWi6jvO$O8rGOc001WuInUurYINk2q0DPbeG9RoihCupZT74KM1qMVzLSm2NEleXCf1TVd4JkphlCa9.jwBZ/fHrbTe3Z0
-        groups: sudo
-        sudo: ALL=(ALL) NOPASSWD:ALL
-        lock_passwd: false
-        shell: /bin/bash
+        ssh_authorized_keys:
+          - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDAohUYma9nnGJelwFoLA/L970TxlTLdhlpH0TKYFaQx7H4vTDAXxVm0W5Zn94uuzgFxrvc0zDkdW8YcQfmgMrB6qWvWGnE2aRKBnpLBJIAdsMYuq1VxYG3njmIGISorw7f09fb1XBcqEcx0h26v1VIV7iPiKGVaBQBG2HpLtnnUwLZK7FHtKjAQ2lFOLjcVhP7DBFO/T2jn1PPa65hlwkb4m2MUrMvVjyplR6K88LUA7ZMU5DQfSTqZjNSYMR4yyfk2bGBGVlq8KlHvCCAaSlhxE4CWkTM7Uta+UuXUrzojuyBoxqHEnTbzCr5jja5NpiwVbDWa6YHD/MURcSpp5OYjlWUWLke75VgqQKQTbr/PlGF+dLmLBMJzGnILzf5w2jx7TUYkPS2PJtdyDytTpvc7cSQWo4DvhA2PNzDdjq7tjevhsD7P5s978C1KrQMSwo4E0eIt2upwcUkQAmH9rpv4uKuLBYUIST2WFY+2nOG12JEXAoNCLfeNrkZXzMf2BM= salwabalwa@Salwas-MacBook-Pro.local
+    # runcmd:
+    #   - mkdir /run/mydir
+    #   - [ wget, "http://slashdot.org", -O, /run/mydir/index.html ]
+    # package_update: true
+
+  # late-commands:
+  #   - curtin in-target --target=/target -- /bin/bash -c "mkdir -p /home/ansible/.ssh"
+  #   - curtin in-target --target=/target -- /bin/bash -c "echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDAohUYma9nnGJelwFoLA/L970TxlTLdhlpH0TKYFaQx7H4vTDAXxVm0W5Zn94uuzgFxrvc0zDkdW8YcQfmgMrB6qWvWGnE2aRKBnpLBJIAdsMYuq1VxYG3njmIGISorw7f09fb1XBcqEcx0h26v1VIV7iPiKGVaBQBG2HpLtnnUwLZK7FHtKjAQ2lFOLjcVhP7DBFO/T2jn1PPa65hlwkb4m2MUrMvVjyplR6K88LUA7ZMU5DQfSTqZjNSYMR4yyfk2bGBGVlq8KlHvCCAaSlhxE4CWkTM7Uta+UuXUrzojuyBoxqHEnTbzCr5jja5NpiwVbDWa6YHD/MURcSpp5OYjlWUWLke75VgqQKQTbr/PlGF+dLmLBMJzGnILzf5w2jx7TUYkPS2PJtdyDytTpvc7cSQWo4DvhA2PNzDdjq7tjevhsD7P5s978C1KrQMSwo4E0eIt2upwcUkQAmH9rpv4uKuLBYUIST2WFY+2nOG12JEXAoNCLfeNrkZXzMf2BM= salwabalwa@Salwas-MacBook-Pro.local' >> /home/ansible/.ssh/authorized_keys"
+  #   - curtin in-target --target=/target -- /bin/bash -c "chown -R ansible /home/ansible/.ssh"
+  #   - curtin in-target --target=/target -- /bin/bash -c "chmod 700 /home/ansible/.ssh"
+  #   - curtin in-target --target=/target -- /bin/bash -c "chmod 600 /home/ansible/.ssh/authorized_keys"
