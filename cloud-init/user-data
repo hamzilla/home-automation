@@ -155,18 +155,27 @@ autoinstall:
       - [ wget, "http://slashdot.org", -O, /run/mydir/index.html ]
 
     ansible:
-      install_method: pip
-      package_name: ansible
-      run_user: ansible
-      galaxy:
-        actions:
-          - ["ansible-galaxy", "collection", "install", "community.general"]
+      # install_method: pip
+      # package_name: ansible
+      # run_user: ansible
+      # galaxy:
+      #   actions:
+      #     - ["ansible-galaxy", "collection", "install", "community.general"]
+      package_name: ansible-core
+      install_method: distro
+      pull:
+        url: https://github.com/hamzilla/home-automation.git
+        playbook_name: ansible/debian.yaml
+        # timeout: "120"
+        # sleep: "5"
 
       # setup_controller:
       #   repositories:
-      #     - path: /home/ansible/my-repo/
-      #       source: git@github.com:holmanb/vmboot.git
+      #     - path: /home/ansible/
+      #       source: https://github.com/holmanb/vmboot.git
       #   run_ansible:
-      #     - playbook_dir: /home/ansible/my-repo
+      #     - playbook_dir: /home/ansible/vmboot
       #       playbook_name: debian.yml
       #       timeout: 120
+      #       forks: 1
+            
