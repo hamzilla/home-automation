@@ -1,5 +1,13 @@
 #cloud-config
 
+# autoinstall is an ubuntu feature which leverages cloud-init, which is a cross platform way to automatically setup
+# devices. cloud-init syntax can be used here, either at the top level (outside of autoinstall) or under 
+# autoinstall.user-data. 
+# Documentation
+#   autoinstall: https://canonical-subiquity.readthedocs-hosted.com/en/latest/intro-to-autoinstall.html
+#   cloud-init: https://cloudinit.readthedocs.io/en/latest/index.html
+#   autoinstall + cloud-init: https://canonical-subiquity.readthedocs-hosted.com/en/latest/explanation/cloudinit-autoinstall-interaction.html#cloud-init-and-autoinstall-interaction
+
 # cloud-init setting
 package_update: true
 
@@ -46,6 +54,7 @@ autoinstall:
       classic: true    
 
   shutdown: reboot
+  
   storage:
     config:
       - id: disk-vda
@@ -135,7 +144,7 @@ autoinstall:
         device: home_lv_fs
         path: /home
 
-  # cloud-init settings which run on first boot: https://cloudinit.readthedocs.io/en/latest/index.html
+  # cloud-init settings which run on first boot (not every boot). Though there does exist an option to run commands per boot. 
   user-data:
     hostname: autoinstall-server
     users:
@@ -155,27 +164,27 @@ autoinstall:
       - [ wget, "http://slashdot.org", -O, /run/mydir/index.html ]
 
     ansible:
-      # install_method: pip
-      # package_name: ansible
-      # run_user: ansible
-      # galaxy:
-      #   actions:
-      #     - ["ansible-galaxy", "collection", "install", "community.general"]
+      # Install ansible
       package_name: ansible-core
       install_method: distro
+      # pull will run the playbook locally (we could have optionally done this in setup_controllers)
       pull:
         url: https://github.com/hamzilla/home-automation.git
         playbook_name: ansible/debian.yaml
         # timeout: "120"
         # sleep: "5"
 
-      # setup_controller:
-      #   repositories:
-      #     - path: /home/ansible/
-      #       source: https://github.com/holmanb/vmboot.git
-      #   run_ansible:
-      #     - playbook_dir: /home/ansible/vmboot
-      #       playbook_name: debian.yml
-      #       timeout: 120
-      #       forks: 1
+      setup_controller:
+        # clone the repository
+        repositories:
+          - path: /home/ansible/k3s-ansible
+            source: https://github.com/hamzilla/k3s-ansible.git
+        # run the playbook
+        run_ansible:
+          - playbook_dir: /home/ansible/k3s-ansible
+            playbook_name: playbooks/site.yml
+            inventory: inventory.yml
+            connection: local
+            timeout: 240
+            forks: 1
             
