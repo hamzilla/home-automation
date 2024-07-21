@@ -28,7 +28,7 @@ autoinstall:
       ethernets:
         enp1s0:
           addresses:
-            - 10.10.10.124/24
+            - 10.10.10.125/24
           routes:
             - to: default
               via: 10.10.10.1
@@ -147,9 +147,11 @@ autoinstall:
   # cloud-init settings which run on first boot (not every boot). Though there does exist an option to run commands per boot. 
   user-data:
     hostname: autoinstall-server
+    # create users
     users:
       - name: ansible
-        groups: sudo,admin,wheel
+        # by adding docker group here, it seems to also add it for us
+        groups: sudo,admin,wheel,docker
         sudo: ALL=(ALL) NOPASSWD:ALL
         shell: /bin/bash
         lock_passwd: false
@@ -158,6 +160,7 @@ autoinstall:
         passwd: $6$3q6tsfJ7xDWi6jvO$O8rGOc001WuInUurYINk2q0DPbeG9RoihCupZT74KM1qMVzLSm2NEleXCf1TVd4JkphlCa9.jwBZ/fHrbTe3Z0
         ssh_authorized_keys:
           - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDAohUYma9nnGJelwFoLA/L970TxlTLdhlpH0TKYFaQx7H4vTDAXxVm0W5Zn94uuzgFxrvc0zDkdW8YcQfmgMrB6qWvWGnE2aRKBnpLBJIAdsMYuq1VxYG3njmIGISorw7f09fb1XBcqEcx0h26v1VIV7iPiKGVaBQBG2HpLtnnUwLZK7FHtKjAQ2lFOLjcVhP7DBFO/T2jn1PPa65hlwkb4m2MUrMvVjyplR6K88LUA7ZMU5DQfSTqZjNSYMR4yyfk2bGBGVlq8KlHvCCAaSlhxE4CWkTM7Uta+UuXUrzojuyBoxqHEnTbzCr5jja5NpiwVbDWa6YHD/MURcSpp5OYjlWUWLke75VgqQKQTbr/PlGF+dLmLBMJzGnILzf5w2jx7TUYkPS2PJtdyDytTpvc7cSQWo4DvhA2PNzDdjq7tjevhsD7P5s978C1KrQMSwo4E0eIt2upwcUkQAmH9rpv4uKuLBYUIST2WFY+2nOG12JEXAoNCLfeNrkZXzMf2BM= salwabalwa@Salwas-MacBook-Pro.local
+    # run commands on first boot (runs only once ever)
     runcmd:
       # this is very specific. it doesnt work if it's not an array
       - [mkdir, /run/mydir]
