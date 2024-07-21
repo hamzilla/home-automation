@@ -1,0 +1,1 @@
+* /var/log/cloud-init.log looks to have logs of installer run
