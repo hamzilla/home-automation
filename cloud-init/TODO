@@ -1,3 +1,2 @@
-# some user with access to docker
 # auto decrypt luks 
-# run an ansible playbook
+# disable ipv6
