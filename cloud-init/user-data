@@ -65,6 +65,11 @@ autoinstall:
     # swap:
       # size: 0
 
+  # Shell commands to run after the installation has completed successfully and any updates and packages installed, just before the system reboots. 
+  # late-commands:
+    # - curtin in-target --target=/target -- sed -ie 's/GRUB_CMDLINE_LINUX=.*/GRUB_CMDLINE_LINUX="ipv6.disable=1"/' /target/etc/default/grub
+    # - curtin in-target --target=/target -- update-grub2
+    
   # cloud-init settings which run on first boot (not every boot). Though there does exist an option to run commands per boot. 
   user-data:
     hostname: autoinstall-server
